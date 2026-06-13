@@ -6,14 +6,14 @@ import { Reagent } from '../models/reagent.entity';
 import { StockInRecord } from '../models/stockInRecord.entity';
 import { StockInController } from '../controllers/stockIn.controller';
 import { AuditService } from '../services/audit.service';
-import { AlertService } from '../services/alert.service';
 import { ConsumableService } from '../services/consumable.service';
 import { ReagentService } from '../services/reagent.service';
 import { StockInService } from '../services/stockIn.service';
+import { AlertRoutesModule } from './alert.routes';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([StockInRecord, Reagent, Consumable, AuditLog])],
+  imports: [TypeOrmModule.forFeature([StockInRecord, Reagent, Consumable, AuditLog]), AlertRoutesModule],
   controllers: [StockInController],
-  providers: [StockInService, ReagentService, ConsumableService, AuditService, AlertService],
+  providers: [StockInService, ReagentService, ConsumableService, AuditService],
 })
 export class StockInRoutesModule {}

@@ -1,13 +1,39 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { createClient, RedisClientType } from 'redis';
+import { Repository } from 'typeorm';
 import { Consumable } from '../models/consumable.entity';
 import { Reagent } from '../models/reagent.entity';
 import { redisConfig } from '../config/redis.config';
 import { isLowStock } from '../utils/stockAlert';
 
+interface LowStockItem {
+  id: string;
+  name: string;
+  currentStock: number;
+  minStockThreshold: number;
+  location: string;
+  unit: string;
+}
+
+interface LowStockDashboard {
+  reagents: LowStockItem[];
+  consumables: LowStockItem[];
+  summary: {
+    total: number;
+    reagentCount: number;
+    consumableCount: number;
+  };
+}
+
 @Injectable()
 export class AlertService {
   private client?: RedisClientType;
+
+  constructor(
+    @InjectRepository(Reagent) private readonly reagentRepo: Repository<Reagent>,
+    @InjectRepository(Consumable) private readonly consumableRepo: Repository<Consumable>,
+  ) {}
 
   private async redis() {
     if (!this.client) {
@@ -26,5 +52,48 @@ export class AlertService {
     } catch {
       return;
     }
+  }
+
+  async getLowStockDashboard(): Promise<LowStockDashboard> {
+    const [reagents, consumables] = await Promise.all([
+      this.reagentRepo
+        .createQueryBuilder('reagent')
+        .where('reagent.currentStock <= reagent.minStockThreshold')
+        .orderBy('reagent.name', 'ASC')
+        .getMany(),
+      this.consumableRepo
+        .createQueryBuilder('consumable')
+        .where('consumable.currentStock <= consumable.minStockThreshold')
+        .orderBy('consumable.name', 'ASC')
+        .getMany(),
+    ]);
+
+    const lowStockReagents = reagents.map((r) => ({
+      id: r.id,
+      name: r.name,
+      currentStock: Number(r.currentStock),
+      minStockThreshold: Number(r.minStockThreshold),
+      location: r.location,
+      unit: r.unit,
+    }));
+
+    const lowStockConsumables = consumables.map((c) => ({
+      id: c.id,
+      name: c.name,
+      currentStock: Number(c.currentStock),
+      minStockThreshold: Number(c.minStockThreshold),
+      location: c.location,
+      unit: c.unit,
+    }));
+
+    return {
+      reagents: lowStockReagents,
+      consumables: lowStockConsumables,
+      summary: {
+        total: lowStockReagents.length + lowStockConsumables.length,
+        reagentCount: lowStockReagents.length,
+        consumableCount: lowStockConsumables.length,
+      },
+    };
   }
 }

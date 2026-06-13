@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { databaseConfig } from './config/database.config';
+import { AlertRoutesModule } from './routes/alert.routes';
 import { ConsumableRoutesModule } from './routes/consumable.routes';
 import { InventoryCheckRoutesModule } from './routes/inventoryCheck.routes';
 import { ReagentRoutesModule } from './routes/reagent.routes';
@@ -18,6 +19,7 @@ import { ValidationMiddleware } from './middlewares/validation.middleware';
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: ['../.env', '.env'] }),
     TypeOrmModule.forRoot(databaseConfig()),
+    AlertRoutesModule,
     ReagentRoutesModule,
     ConsumableRoutesModule,
     StockInRoutesModule,

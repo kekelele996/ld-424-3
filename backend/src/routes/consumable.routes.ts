@@ -4,13 +4,13 @@ import { AuditLog } from '../models/auditLog.entity';
 import { Consumable } from '../models/consumable.entity';
 import { ConsumableController } from '../controllers/consumable.controller';
 import { AuditService } from '../services/audit.service';
-import { AlertService } from '../services/alert.service';
 import { ConsumableService } from '../services/consumable.service';
+import { AlertRoutesModule } from './alert.routes';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Consumable, AuditLog])],
+  imports: [TypeOrmModule.forFeature([Consumable, AuditLog]), AlertRoutesModule],
   controllers: [ConsumableController],
-  providers: [ConsumableService, AuditService, AlertService],
+  providers: [ConsumableService, AuditService],
   exports: [ConsumableService],
 })
 export class ConsumableRoutesModule {}

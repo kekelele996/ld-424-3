@@ -4,13 +4,13 @@ import { AuditLog } from '../models/auditLog.entity';
 import { Reagent } from '../models/reagent.entity';
 import { ReagentController } from '../controllers/reagent.controller';
 import { AuditService } from '../services/audit.service';
-import { AlertService } from '../services/alert.service';
 import { ReagentService } from '../services/reagent.service';
+import { AlertRoutesModule } from './alert.routes';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Reagent, AuditLog])],
+  imports: [TypeOrmModule.forFeature([Reagent, AuditLog]), AlertRoutesModule],
   controllers: [ReagentController],
-  providers: [ReagentService, AuditService, AlertService],
+  providers: [ReagentService, AuditService],
   exports: [ReagentService],
 })
 export class ReagentRoutesModule {}
