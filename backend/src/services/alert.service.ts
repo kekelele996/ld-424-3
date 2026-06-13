@@ -6,25 +6,7 @@ import { Consumable } from '../models/consumable.entity';
 import { Reagent } from '../models/reagent.entity';
 import { redisConfig } from '../config/redis.config';
 import { isLowStock } from '../utils/stockAlert';
-
-interface LowStockItem {
-  id: string;
-  name: string;
-  currentStock: number;
-  minStockThreshold: number;
-  location: string;
-  unit: string;
-}
-
-interface LowStockDashboard {
-  reagents: LowStockItem[];
-  consumables: LowStockItem[];
-  summary: {
-    total: number;
-    reagentCount: number;
-    consumableCount: number;
-  };
-}
+import { LowStockDashboard } from '../types/interfaces';
 
 @Injectable()
 export class AlertService {
